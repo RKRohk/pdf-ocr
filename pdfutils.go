@@ -51,41 +51,48 @@ func splitPdf(fileName string, tempDir string) error {
 		channel <- 0
 	}
 
-	if a := recover(); a != nil {
-		fmt.Println("Recover : ", a)
-		return fmt.Errorf("error processing file")
-	}
-
 	var wg sync.WaitGroup
 	for i := 0; i < doc.NumPage(); i++ {
 
 		wg.Add(1)
-		go func(i int) error {
-			<-channel
-			fmt.Println("Processing file number : ", i)
-			img, err := doc.Image(i)
-			if err != nil {
-				channel <- 0
-				return err
-			}
-			f, err := os.Create(filepath.Join(tempDir, fmt.Sprintf("%s:%03d.jpg", fileNameWithoutExtension, i)))
-			if err != nil {
-				channel <- 0
-				return err
-			}
-			err = jpeg.Encode(f, img, &jpeg.Options{Quality: jpeg.DefaultQuality})
-			if err != nil {
-				channel <- 0
-				return err
-			}
-			f.Close()
-			channel <- 0
-			wg.Done()
-			return nil
-		}(i)
+		go convertPageToJPEG(channel, i, doc, tempDir, fileNameWithoutExtension, &wg)
 
 	}
+
+	fmt.Println("Waiting for all goroutines to finish")
 	wg.Wait()
+
 	return nil
 
+}
+
+func convertPageToJPEG(channel chan int, i int, doc *fitz.Document, tempDir string, fileNameWithoutExtension string, wg *sync.WaitGroup) error {
+	<-channel
+
+	//Ensure workgroup is marked as done even in a panic
+	defer func() {
+		wg.Done()
+	}()
+
+	//Free up channel
+	defer func() {
+		channel <- 0
+	}()
+
+	fmt.Println("Processing file number : ", i)
+	img, err := doc.Image(i)
+	if err != nil {
+		fmt.Println("Error :", err)
+	}
+	f, err := os.Create(filepath.Join(tempDir, fmt.Sprintf("%s:%03d.jpg", fileNameWithoutExtension, i)))
+	if err != nil {
+		fmt.Println("Error :", err)
+	}
+	defer f.Close()
+
+	err = jpeg.Encode(f, img, &jpeg.Options{Quality: jpeg.DefaultQuality})
+	if err != nil {
+		fmt.Println("Error :", err)
+	}
+	return nil
 }

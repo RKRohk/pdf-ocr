@@ -23,7 +23,5 @@ func TestSplitPdf(t *testing.T) {
 		t.Fail()
 	}
 
-	t.Cleanup(func() {
-		os.RemoveAll(tempDir)
-	})
+	os.RemoveAll(tempDir)
 }
