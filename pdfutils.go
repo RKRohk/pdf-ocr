@@ -33,9 +33,7 @@ func createTempDir(fileName string) (string, error) {
 
 func splitPdf(fileName string, tempDir string) error {
 	fileNameWithoutExtension, _ := getFileNameWithoutExtension(fileName)
-	outputDir := os.TempDir() + "/" + fileNameWithoutExtension
-	os.Mkdir(outputDir, 0700)
-	doc, err := fitz.New("testfile.pdf")
+	doc, err := fitz.New(fileName)
 	if err != nil {
 		return err
 	}

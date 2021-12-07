@@ -7,7 +7,7 @@ import (
 
 func TestSplitPdf(t *testing.T) {
 
-	fileName := "testfile.pdf"
+	fileName := "sample.pdf"
 	fileNameWithoutExtension, err := getFileNameWithoutExtension(fileName)
 	if err != nil {
 		t.Errorf("Error getting file without extension, %v", err)
@@ -18,10 +18,13 @@ func TestSplitPdf(t *testing.T) {
 		t.Errorf("Error creating tempdir %v", err)
 		t.Fail()
 	}
-	err = splitPdf("testfile.pdf", tempDir)
+	err = splitPdf(fileName, tempDir)
 	if err != nil {
 		t.Fail()
 	}
 
-	os.RemoveAll(tempDir)
+	err = os.RemoveAll(tempDir)
+	if err != nil {
+		t.Log("Error deleting the folder : ", err)
+	}
 }

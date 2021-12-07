@@ -4,11 +4,16 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 	"sync"
 )
 
 const simultaneousFiles = 3
+
+var configFilePath = path.Join(os.Getenv("PWD"), "configfile")
+
+type Anonymous = struct{}
 
 var limiterChannel = make(chan struct{}, simultaneousFiles)
 
@@ -19,17 +24,25 @@ func init() {
 }
 
 //ocr performs ocr and returns an image with an invisible ocr layer for each file given to it
-func ocr(wg *sync.WaitGroup, filePath string, channel chan struct{}) {
-	fileNameWithoutFolder := strings.Split(filePath, "/")[len(strings.Split(filePath, "/"))-1]
-	fileNameWithoutExtension := strings.Split(fileNameWithoutFolder, ".")[0]
-	pwd := os.Getenv("PWD")
-	sourceFile := filePath
-	outputFile := pwd + "/" + "output" + "/" + fileNameWithoutExtension
-	cmd := exec.Command("tesseract", sourceFile, outputFile, pwd+"/configfile")
+//
+//inputFilePath should be the absolute path to the input jpeg file
+//
+//outputPath should be the path to the folder where the OCR'd pdf should be stored
+func ocr(wg *sync.WaitGroup, inputFilePath string, outputPath string, channel chan Anonymous) {
+
+	defer wg.Done()
+	defer func() {
+		channel <- Anonymous{}
+	}()
+
+	fileNameWithoutFolder := strings.Split(inputFilePath, "/")[len(strings.Split(inputFilePath, "/"))-1]
+	fileNameWithoutExtension, _ := getFileNameWithoutExtension(fileNameWithoutFolder)
+
+	cmd := exec.Command("tesseract", inputFilePath, outputPath+"/"+fileNameWithoutExtension, configFilePath)
+	fmt.Println(cmd)
 	err := cmd.Run()
 	if err != nil {
-		fmt.Println("error while performing ocr on " + fileNameWithoutFolder + ": " + err.Error())
+		fmt.Println("error while performing ocr on " + fileNameWithoutFolder + " : " + err.Error())
+		return
 	}
-	wg.Done()
-	channel <- struct{}{}
 }
