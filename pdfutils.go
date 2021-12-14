@@ -26,13 +26,14 @@ func getFileNameWithoutExtension(fileName string) (string, error) {
 
 func createTempDir(fileName string) (string, error) {
 	tempDir, err := os.MkdirTemp(os.TempDir(), fileName)
-	if err != nil {
-		return "", err
-	}
-	return tempDir, nil
-
+	return tempDir, err
 }
 
+//Splits the pdf into multiple pdfs
+//
+//fileName: the absolute path to the pdf file
+//
+//tempDir: the absolute path to the temp directory
 func splitPdf(fileName string, tempDir string) error {
 	fileNameWithoutExtension, _ := getFileNameWithoutExtension(fileName)
 	doc, err := fitz.New(fileName)
@@ -66,6 +67,7 @@ func splitPdf(fileName string, tempDir string) error {
 
 }
 
+//Converts a page to jpeg and saves it to the temp directory
 func convertPageToJPEG(channel chan int, i int, doc *fitz.Document, tempDir string, fileNameWithoutExtension string, wg *sync.WaitGroup) error {
 	<-channel
 
@@ -97,8 +99,17 @@ func convertPageToJPEG(channel chan int, i int, doc *fitz.Document, tempDir stri
 	return nil
 }
 
+//Joins the pdfs in the temp directory into one pdf
+//
+//outputDir : the absolute path to the output directory
+//
+//outputFile: absolute path to the output file
 func joinPDF(outputDir string, outputFile string) {
 	files, err := os.ReadDir(outputDir)
+
+	if err != nil {
+		log.Panic("Error reading files from temp directory: ", err)
+	}
 
 	configuration := api.LoadConfiguration()
 
