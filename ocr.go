@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -39,10 +39,10 @@ func ocr(wg *sync.WaitGroup, inputFilePath string, outputPath string, channel ch
 	fileNameWithoutExtension, _ := getFileNameWithoutExtension(fileNameWithoutFolder)
 
 	cmd := exec.Command("tesseract", inputFilePath, outputPath+"/"+fileNameWithoutExtension, configFilePath)
-	fmt.Println(cmd)
+	log.Println(cmd)
 	err := cmd.Run()
 	if err != nil {
-		fmt.Println("error while performing ocr on " + fileNameWithoutFolder + " : " + err.Error())
+		log.Println("error while performing ocr on " + fileNameWithoutFolder + " : " + err.Error())
 		return
 	}
 }

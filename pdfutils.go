@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"image/jpeg"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/gen2brain/go-fitz"
+	"github.com/pdfcpu/pdfcpu/pkg/api"
 )
 
 //Has shown to give good results
@@ -42,7 +44,7 @@ func splitPdf(fileName string, tempDir string) error {
 		return err
 	}
 
-	fmt.Println("temp dir is : ", tempDir)
+	log.Println("temp dir is : ", tempDir)
 
 	channel := make(chan int, simultaneousSplit)
 	for c := 0; c < simultaneousSplit; c++ {
@@ -57,7 +59,7 @@ func splitPdf(fileName string, tempDir string) error {
 
 	}
 
-	fmt.Println("Waiting for all goroutines to finish")
+	log.Println("Waiting for all goroutines to finish")
 	wg.Wait()
 
 	return nil
@@ -77,20 +79,36 @@ func convertPageToJPEG(channel chan int, i int, doc *fitz.Document, tempDir stri
 		channel <- 0
 	}()
 
-	fmt.Println("Processing file number : ", i)
+	log.Println("Processing file number : ", i)
 	img, err := doc.Image(i)
 	if err != nil {
-		fmt.Println("Error :", err)
+		log.Println("Error :", err)
 	}
 	f, err := os.Create(filepath.Join(tempDir, fmt.Sprintf("%s:%03d.jpg", fileNameWithoutExtension, i)))
 	if err != nil {
-		fmt.Println("Error :", err)
+		log.Println("Error :", err)
 	}
 	defer f.Close()
 
 	err = jpeg.Encode(f, img, &jpeg.Options{Quality: jpeg.DefaultQuality})
 	if err != nil {
-		fmt.Println("Error :", err)
+		log.Println("Error :", err)
 	}
 	return nil
+}
+
+func joinPDF(outputDir string, outputFile string) {
+	files, err := os.ReadDir(outputDir)
+
+	configuration := api.LoadConfiguration()
+
+	filesWithFullPath := make([]string, len(files))
+	for index, fileName := range files {
+		filesWithFullPath[index] = filepath.Join(outputDir, fileName.Name())
+	}
+
+	err = api.MergeAppendFile(filesWithFullPath, outputFile, configuration)
+	if err != nil {
+		log.Println("Error merging files : ", err)
+	}
 }

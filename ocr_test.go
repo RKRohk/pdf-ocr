@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"sync"
@@ -27,13 +28,15 @@ func TestJpegToPdfConversion(t *testing.T) {
 	wg.Wait()
 
 	//Check if pdf exists
-
+	fmt.Println("output path is :", outputPath)
 	if files, err := os.ReadDir(outputPath); err != nil {
 		t.Fail()
 	} else {
-		if !(len(files) == 0 && files[0].Name() == "testfile.pdf") {
+		if !(len(files) > 0 && files[0].Name() == "testfile.pdf") {
 			t.Log("length of files was more than 1 or file was not found")
 			t.Fail()
+		} else {
+			joinPDF(outputPath, path.Join(pwd, "output.pdf"))
 		}
 	}
 }
