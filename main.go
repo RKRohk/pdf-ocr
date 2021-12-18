@@ -1,7 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -21,12 +24,21 @@ func main() {
 		} else {
 
 			//TODO: do something with the files
-			_ = files[0]
+			file := files[0]
+
+			c.SaveFile(file, os.TempDir()+"/"+file.Filename)
+
+			id := uuid.New()
+			performOCR(os.TempDir()+"/"+file.Filename, file.Filename, id)
+
+			c.Redirect("/ocr/" + id.String() + ".pdf")
 
 		}
 
 		return nil
 	})
+
+	app.Static("/ocr", "./output")
 
 	app.Listen(":3000")
 }

@@ -21,6 +21,7 @@ func getFileNameWithoutExtension(fileName string) (string, error) {
 		return "", fmt.Errorf("invalid filename")
 	}
 	fileNameWithoutExtension := strings.Split(fileName, ".")[0]
+	fileNameWithoutExtension = strings.Split(fileNameWithoutExtension, "/")[len(strings.Split(fileNameWithoutExtension, "/"))-1]
 	return fileNameWithoutExtension, nil
 }
 
@@ -31,12 +32,12 @@ func createTempDir(fileName string) (string, error) {
 
 //Splits the pdf into multiple pdfs
 //
-//fileName: the absolute path to the pdf file
+//filePath: the absolute path to the pdf file
 //
 //tempDir: the absolute path to the temp directory
-func splitPdf(fileName string, tempDir string) error {
-	fileNameWithoutExtension, _ := getFileNameWithoutExtension(fileName)
-	doc, err := fitz.New(fileName)
+func splitPdf(filePath string, tempDir string) error {
+	fileNameWithoutExtension, _ := getFileNameWithoutExtension(filePath)
+	doc, err := fitz.New(filePath)
 	if err != nil {
 		return err
 	}
@@ -113,10 +114,14 @@ func joinPDF(outputDir string, outputFile string) {
 
 	configuration := api.LoadConfiguration()
 
-	filesWithFullPath := make([]string, len(files))
-	for index, fileName := range files {
-		filesWithFullPath[index] = filepath.Join(outputDir, fileName.Name())
+	filesWithFullPath := make([]string, 0)
+	for _, fileName := range files {
+		if strings.HasSuffix(fileName.Name(), ".pdf") {
+			filesWithFullPath = append(filesWithFullPath, filepath.Join(outputDir, fileName.Name()))
+		}
 	}
+
+	log.Println("Joining files in : ", filesWithFullPath)
 
 	err = api.MergeAppendFile(filesWithFullPath, outputFile, configuration)
 	if err != nil {

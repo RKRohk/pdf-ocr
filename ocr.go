@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 const simultaneousFiles = 3
@@ -21,6 +24,38 @@ func init() {
 	for range make([]struct{}, simultaneousFiles) {
 		limiterChannel <- struct{}{}
 	}
+}
+
+func performOCR(inputFilePath string, filename string, id uuid.UUID) {
+	var wg sync.WaitGroup
+
+	outputDir, err := createTempDir(filename) //TODO(): handle error
+	if err != nil {
+		log.Println("error creating temp dir for file " + inputFilePath + " : " + err.Error())
+	}
+
+	//split pdf
+	err = splitPdf(inputFilePath, outputDir)
+
+	if err != nil {
+		log.Println("error splitting pdf " + inputFilePath + " : " + err.Error())
+	}
+	//do ocr on every page
+
+	pages, _ := os.ReadDir(outputDir)
+	for _, page := range pages {
+		wg.Add(1)
+		<-limiterChannel
+		log.Println("Performing ocr on page", page.Name())
+		log.Println(page)
+		go ocr(&wg, path.Join(outputDir, page.Name()), outputDir, limiterChannel)
+	}
+
+	wg.Wait()
+	//merge
+
+	joinPDF(outputDir, path.Join(os.Getenv("PWD"), "output", fmt.Sprintf("%s.pdf", id)))
+
 }
 
 //ocr performs ocr and returns an image with an invisible ocr layer for each file given to it

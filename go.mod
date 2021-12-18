@@ -6,6 +6,7 @@ require (
 	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/gen2brain/go-fitz v1.18.0 // indirect
 	github.com/gofiber/fiber/v2 v2.23.0 // indirect
+	github.com/google/uuid v1.3.0
 	github.com/hhrutter/lzw v0.0.0-20190829144645-6f07a24e8650 // indirect
 	github.com/hhrutter/tiff v0.0.0-20190829141212-736cae8d0bc7 // indirect
 	github.com/klauspost/compress v1.13.4 // indirect
