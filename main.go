@@ -1,12 +1,22 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
+
+var PORT, set = os.LookupEnv("PORT")
+
+func init() {
+	if !set {
+		PORT = "3000"
+	}
+}
 
 func main() {
 	app := fiber.New()
@@ -27,7 +37,7 @@ func main() {
 			//TODO: do something with the files
 			file := files[0]
 
-			//check if filename is not pdf 
+			//check if filename is not pdf
 			if !strings.HasSuffix(file.Filename, ".pdf") {
 				return fiber.NewError(fiber.ErrBadRequest.Code, "file is not pdf")
 			}
@@ -46,5 +56,6 @@ func main() {
 
 	app.Static("/ocr", "./output")
 
-	app.Listen(":3000")
+	log.Println("App listening on port :" + PORT)
+	app.Listen(fmt.Sprintf(":%s", PORT))
 }
