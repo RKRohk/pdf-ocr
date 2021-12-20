@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -25,6 +26,11 @@ func main() {
 
 			//TODO: do something with the files
 			file := files[0]
+
+			//check if filename is not pdf 
+			if !strings.HasSuffix(file.Filename, ".pdf") {
+				return fiber.NewError(fiber.ErrBadRequest.Code, "file is not pdf")
+			}
 
 			c.SaveFile(file, os.TempDir()+"/"+file.Filename)
 
