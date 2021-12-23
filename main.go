@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/google/uuid"
 )
 
@@ -14,12 +15,14 @@ var PORT, set = os.LookupEnv("PORT")
 
 func init() {
 	if !set {
-		PORT = "3000"
+		PORT = "8080"
 	}
 }
 
 func main() {
 	app := fiber.New()
+
+	app.Use(cors.New())
 
 	app.Post("/ocr", func(c *fiber.Ctx) error {
 		multipartForm, err := c.MultipartForm()
@@ -31,6 +34,7 @@ func main() {
 
 		if len(files) == 0 {
 
+			log.Println("no files uploaded by the user")
 			return fiber.NewError(fiber.ErrBadRequest.Code, "no files uploaded")
 		} else {
 

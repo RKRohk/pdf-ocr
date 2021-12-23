@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
-import Form from "../components/Form";
+import { FormEvent, useState } from "react";
+import Form, { FormState } from "../components/Form";
 
 export default function Home() {
   return (
@@ -14,12 +15,7 @@ export default function Home() {
         <h1>PDF OCR</h1>
         <div className="flex">
           <div className="mx-auto my-auto">
-            <Form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-              }}
-            />
+            <Form />
           </div>
         </div>
       </main>
