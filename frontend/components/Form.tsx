@@ -26,7 +26,7 @@ const Form = () => {
         body: formData,
       });
       const data = response.url;
-      setDownUri(data);
+      setDownUri(data.trim());
       setFormState(FormState.SUCCESS);
       console.log(data);
     } catch (e) {
