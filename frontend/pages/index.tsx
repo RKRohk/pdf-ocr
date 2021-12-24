@@ -2,6 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import Form, { FormState } from "../components/Form";
+import Header from "../components/Header";
 
 export default function Home() {
   return (
@@ -12,7 +13,7 @@ export default function Home() {
       </Head>
 
       <main className="h-full w-full">
-        <h1>PDF OCR</h1>
+        <Header />
         <div className="flex">
           <div className="mx-auto my-auto">
             <Form />

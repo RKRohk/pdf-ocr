@@ -44,7 +44,7 @@ const Form = () => {
           </p>
           <div>
             <input
-              className="file:btn-form file:bg-red-400 file:hover:bg-red-500 file:shadow-red-300"
+              className="file:btn-form file:bg-red-400 file:hover:bg-red-500 file:shadow-red-300 w-full "
               type="file"
               id="file"
               onChange={(e) => setFile(e.target.files[0])}
@@ -53,7 +53,7 @@ const Form = () => {
           <div className="p-2">
             <button
               disabled={formState === FormState.SUBMITTING}
-              className="btn-form flex flex-col bg-purple-500 hover:bg-gradient-to-br w-full hover:from-purple-400 hover:to-purple-600 hover:scale-110 transition-transform duration-150 py-5 disabled:bg-slate-400"
+              className="btn-form flex flex-col bg-purple-600 hover:bg-purple-700 w-full py-5 hover:disabled:bg-slate-400 disabled:bg-slate-400"
             >
               {formState === FormState.SUBMITTING && (
                 <div className="p-2 mx-auto">
