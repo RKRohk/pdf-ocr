@@ -21,7 +21,7 @@ const Form = () => {
 
     try {
       setFormState(FormState.SUBMITTING);
-      const response = await fetch("http://localhost:8080/ocr", {
+      const response = await fetch("/api/ocr", {
         method: "post",
         body: formData,
       });
@@ -106,7 +106,7 @@ const Form = () => {
         </form>
 
         <div>
-          {downloadUri && (
+          {formState === FormState.SUCCESS && downloadUri && (
             <a target="_blank" href={downloadUri}>
               Download the file from here!
             </a>
