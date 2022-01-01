@@ -13,14 +13,23 @@ const Form = () => {
 
   const [downloadUri, setDownUri] = useState<string>();
 
+  const [error, setError] = useState("");
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
 
-    formData.append("file", file); //TODO (Fix unsafe type conversion)
+    if (!file) {
+      setFormState(FormState.ERROR);
+      setError("no file selected!");
+      return;
+    }
+    formData.append("file", file);
 
     try {
       setFormState(FormState.SUBMITTING);
+      setError("");
+      setDownUri("");
       const response = await fetch("/api/ocr", {
         method: "post",
         body: formData,
@@ -31,6 +40,7 @@ const Form = () => {
       console.log(data);
     } catch (e) {
       setFormState(FormState.ERROR);
+      setError(e);
       console.error(e);
     }
   };
@@ -106,6 +116,7 @@ const Form = () => {
         </form>
 
         <div>
+          {error && <p className="text-red-500">{error}</p>}
           {formState === FormState.SUCCESS && downloadUri && (
             <a target="_blank" href={downloadUri}>
               Download the file from here!
