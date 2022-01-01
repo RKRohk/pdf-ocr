@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  backend:
+    build: ./
+    volumes:
+      - output:/bin/output:rw
+
+  frontend:
+    build: ./frontend
+    
