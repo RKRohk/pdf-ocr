@@ -5,7 +5,16 @@ services:
     build: ./
     volumes:
       - output:/bin/output:rw
+    networks:
+      - outside
 
   frontend:
     build: ./frontend
-    
+    networks:
+      - outside
+
+volumes:
+  output:
+
+networks:
+  outside: external
