@@ -30,7 +30,7 @@ const Form = () => {
       setFormState(FormState.SUBMITTING);
       setError("");
       setDownUri("");
-      const response = await fetch("/api/ocr", {
+      const response = await fetch("/ocr", {
         method: "post",
         body: formData,
       });
@@ -75,14 +75,14 @@ const Form = () => {
                     x="0px"
                     y="0px"
                     viewBox="0 0 100 100"
-                    enable-background="new 0 0 0 0"
+                    enableBackground="new 0 0 0 0"
                     xmlSpace="preserve"
                     className="h-10"
                   >
                     <circle
                       fill="none"
                       stroke="#fff"
-                      stroke-width="4"
+                      strokeWidth="4"
                       cx="50"
                       cy="50"
                       r="44"
@@ -91,7 +91,7 @@ const Form = () => {
                     <circle
                       fill="#fff"
                       stroke="#e74c3c"
-                      stroke-width="3"
+                      strokeWidth="3"
                       cx="8"
                       cy="54"
                       r="6"
@@ -118,7 +118,7 @@ const Form = () => {
         <div>
           {error && <p className="text-red-500">{error}</p>}
           {formState === FormState.SUCCESS && downloadUri && (
-            <a target="_blank" href={downloadUri}>
+            <a target="_blank" rel="noreferrer" href={downloadUri}>
               Download the file from here!
             </a>
           )}
