@@ -12,9 +12,9 @@ COPY . .
 RUN go build -o /bin/pdf-ocr
 
 FROM ubuntu
-
+WORKDIR /app/
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /bin/pdf-ocr /bin/pdf-ocr
+COPY --from=build /bin/pdf-ocr /app/pdf-ocr
 RUN apt-get update -qq
 
 # You need librariy files and headers of tesseract and leptonica.
@@ -32,4 +32,4 @@ RUN apt-get install -y -qq \
     tesseract-ocr-eng \
     tesseract-ocr-deu \
     tesseract-ocr-jpn
-ENTRYPOINT ["pdf-ocr"]
+ENTRYPOINT ["./pdf-ocr"]
