@@ -9,7 +9,8 @@ export enum FormState {
 const Form = () => {
   const [formState, setFormState] = useState<FormState>(FormState.IDLE);
 
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | undefined>();
+  const [previousFile, setPreviousFile] = useState<File | undefined>();
 
   const [downloadUri, setDownUri] = useState<string>();
 
@@ -37,6 +38,7 @@ const Form = () => {
       const data = response.url;
       setDownUri(data.trim());
       setFormState(FormState.SUCCESS);
+      setPreviousFile(file);
       console.log(data);
     } catch (e) {
       setFormState(FormState.ERROR);
@@ -62,7 +64,9 @@ const Form = () => {
           </div>
           <div className="p-2">
             <button
-              disabled={formState === FormState.SUBMITTING}
+              disabled={
+                formState === FormState.SUBMITTING || file === previousFile
+              }
               className="btn-form flex flex-col bg-purple-600 hover:bg-purple-700 w-full py-5 hover:disabled:bg-slate-400 disabled:bg-slate-400"
             >
               {formState === FormState.SUBMITTING && (
