@@ -93,7 +93,7 @@ export default function Home() {
           property="og:description"
           content="A completely free online service that adds an invisible layer of text over a PDF of images"
         />
-        <meta property="og:image" content="/ms-icon-150x150.png" />
+        <meta property="og:image" content="/logo.png" />
       </Head>
 
       <main className="h-full w-full">
