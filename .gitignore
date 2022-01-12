@@ -2,3 +2,4 @@ testfile.pdf
 output
 pdf-ocr
 .DS_Store
+docker-compose.yaml
