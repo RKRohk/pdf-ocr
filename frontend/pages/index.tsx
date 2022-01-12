@@ -94,6 +94,7 @@ export default function Home() {
           content="A completely free online service that adds an invisible layer of text over a PDF of images"
         />
         <meta property="og:image" content="/logo.png" />
+        <meta property="twitter:card" content="summary_large_image"></meta>
       </Head>
 
       <main className="h-full w-full">
