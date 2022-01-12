@@ -86,6 +86,14 @@ export default function Home() {
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
         <meta name="theme-color" content="#ffffff" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ocr.rohankakar.me" />
+        <meta property="og:title" content="OCR PDF" />
+        <meta
+          property="og:description"
+          content="A completely free online service that adds an invisible layer of text over a PDF of images"
+        />
+        <meta property="og:image" content="/ms-icon-150x150.png" />
       </Head>
 
       <main className="h-full w-full">
