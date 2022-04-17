@@ -1,5 +1,3 @@
-LABEL org.opencontainers.image.source https://github.com/RKRohk/pdf-ocr
-
 FROM golang as build
 
 WORKDIR /app
