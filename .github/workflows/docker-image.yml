@@ -44,8 +44,8 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          rkrohk/pdf-ocr:${{ github.ref_name }}
-          rkrohk/pdf-ocr:${{ github.sha }}
+          ghcr.io/rkrohk/pdf-ocr:${{ github.ref_name }}
+          ghcr.io/rkrohk/pdf-ocr:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
     
@@ -58,6 +58,6 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          rkrohk/pdf-ocr:latest
+          ghcr.io/rkrohk/pdf-ocr:latest
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
