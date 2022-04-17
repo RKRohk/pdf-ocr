@@ -50,13 +50,14 @@ func performOCR(inputFilePath string, filename string, id string) {
 		<-limiterChannel
 		log.Println("Performing ocr on page", page.Name())
 		log.Println(page)
-		channel <- fmt.Sprintf("Processing page %d of %d", counter, len(pages))
+		channel <- fmt.Sprintf("Processing page %d of %d", counter+1, len(pages))
 		counter++
 		go ocr(&wg, path.Join(outputDir, page.Name()), outputDir, limiterChannel)
 	}
 
 	wg.Wait()
 	//merge
+	channel <- "Merging files"
 
 	joinPDF(outputDir, path.Join(os.Getenv("PWD"), "output", fmt.Sprintf("%s.pdf", id)))
 

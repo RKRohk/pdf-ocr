@@ -16,7 +16,7 @@ const Loading:React.FC<LoadingProps> = ({id}) => {
 
         ws.onmessage = (ev) => {
             console.log("event received ",ev)
-            setMessage(JSON.stringify(ev.data))
+            setMessage(ev.data)
         }
     }
     useEffect(() => {
@@ -25,7 +25,7 @@ const Loading:React.FC<LoadingProps> = ({id}) => {
     },[id])
 
     return <>
-        <p>
+        <p className="text-center">
             {message}
         </p>
     </>

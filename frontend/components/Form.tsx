@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { generateUUID } from "../util/uuid";
 import Loading from "./Loading";
 
 export enum FormState {
@@ -17,11 +18,13 @@ const Form = () => {
 
   const [error, setError] = useState("");
 
-  const id = "34235454"
+  let id //TODO(remove global state)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
+
+    id = generateUUID()
 
     if (!file) {
       setFormState(FormState.ERROR);

@@ -34,14 +34,13 @@ func main() {
 
 	app.Get("/ocr/ws/:id", websocket.New(func(c *websocket.Conn) {
 		id := c.Params("id")
-		channel := db[id]
-		if channel == nil {
+		if db[id] == nil {
 			log.Printf("Channel does not exist for id %s\n", id)
-			db[id] = make(chan string, 100)
+			db[id] = make(chan string, 10)
 		}
-		db[id] <- "uploading file"
-		for message := range channel {
-			log.Printf("sending message %v\n", message)
+		db[id] <- "Uploading file"
+
+		for message := range db[id] {
 			c.WriteMessage(websocket.TextMessage, []byte(message))
 		}
 		c.WriteMessage(websocket.TextMessage, []byte("done"))
@@ -74,9 +73,9 @@ func main() {
 			if id == "" {
 				return fiber.NewError(fiber.ErrBadGateway.Code, "no id sent")
 			}
-			channel := db[id]
-			if channel == nil {
-				db[id] = make(chan string, 100)
+
+			if db[id] == nil {
+				db[id] = make(chan string, 10)
 			}
 			db[id] <- "initializing...."
 
