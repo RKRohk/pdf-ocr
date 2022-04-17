@@ -8,7 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/google/uuid"
+	"github.com/gofiber/websocket/v2"
 )
 
 var PORT, set = os.LookupEnv("PORT")
@@ -20,9 +20,33 @@ func init() {
 }
 
 func main() {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{BodyLimit: 1024 * 1024 * 1024})
 
 	app.Use(cors.New())
+
+	app.Use("/ocr/ws*", func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			c.Locals("allowed", true)
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+
+	app.Get("/ocr/ws/:id", websocket.New(func(c *websocket.Conn) {
+		id := c.Params("id")
+		channel := db[id]
+		if channel == nil {
+			log.Printf("Channel does not exist for id %s\n", id)
+			db[id] = make(chan string, 100)
+		}
+		db[id] <- "uploading file"
+		for message := range channel {
+			log.Printf("sending message %v\n", message)
+			c.WriteMessage(websocket.TextMessage, []byte(message))
+		}
+		c.WriteMessage(websocket.TextMessage, []byte("done"))
+		c.Close()
+	}))
 
 	app.Post("/ocr", func(c *fiber.Ctx) error {
 		multipartForm, err := c.MultipartForm()
@@ -46,12 +70,21 @@ func main() {
 				return fiber.NewError(fiber.ErrBadRequest.Code, "file is not pdf")
 			}
 
+			id := c.FormValue("id", "")
+			if id == "" {
+				return fiber.NewError(fiber.ErrBadGateway.Code, "no id sent")
+			}
+			channel := db[id]
+			if channel == nil {
+				db[id] = make(chan string, 100)
+			}
+			db[id] <- "initializing...."
+
 			c.SaveFile(file, os.TempDir()+"/"+file.Filename)
 
-			id := uuid.New()
 			performOCR(os.TempDir()+"/"+file.Filename, file.Filename, id)
 
-			c.Redirect("/ocr/" + id.String() + ".pdf")
+			c.Redirect("/ocr/" + id + ".pdf")
 
 		}
 

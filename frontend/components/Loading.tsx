@@ -1,0 +1,34 @@
+import { useEffect, useState } from "react"
+
+interface LoadingProps {
+    id: string
+}
+const Loading:React.FC<LoadingProps> = ({id}) => {
+
+    const [message,setMessage] = useState<string>("")
+
+    const initWS = async () => {
+        await new Promise(resolve => setTimeout(resolve,1000))
+        const ws = new WebSocket("ws://localhost:8080/ocr/ws/"+id)
+        ws.onopen = (ev) => {
+            console.log("socket opened")
+        }
+
+        ws.onmessage = (ev) => {
+            console.log("event received ",ev)
+            setMessage(JSON.stringify(ev.data))
+        }
+    }
+    useEffect(() => {
+       initWS()
+        
+    },[id])
+
+    return <>
+        <p>
+            {message}
+        </p>
+    </>
+}
+
+export default Loading

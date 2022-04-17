@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import Loading from "./Loading";
 
 export enum FormState {
   IDLE,
@@ -16,6 +17,8 @@ const Form = () => {
 
   const [error, setError] = useState("");
 
+  const id = "34235454"
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
@@ -26,12 +29,13 @@ const Form = () => {
       return;
     }
     formData.append("file", file);
+    formData.append("id",id)
 
     try {
       setFormState(FormState.SUBMITTING);
       setError("");
       setDownUri("");
-      const response = await fetch("/ocr", {
+      const response = await fetch("http://localhost:8080/ocr", {
         method: "post",
         body: formData,
       });
@@ -42,7 +46,7 @@ const Form = () => {
       console.log(data);
     } catch (e) {
       setFormState(FormState.ERROR);
-      setError(e);
+      setError(JSON.stringify(e));
       console.error(e);
     }
   };
@@ -127,6 +131,7 @@ const Form = () => {
             </a>
           )}
         </div>
+        {formState === FormState.SUBMITTING && <Loading id={id}/>}
       </div>
     </>
   );
