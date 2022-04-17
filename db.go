@@ -1,7 +1,5 @@
 package main
 
-import "github.com/google/uuid"
-
-type Database = map[uuid.UUID]string
+type Database = map[string]chan (string)
 
 var db = Database{}

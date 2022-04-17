@@ -8,8 +8,6 @@ import (
 	"path"
 	"strings"
 	"sync"
-
-	"github.com/google/uuid"
 )
 
 const simultaneousFiles = 3
@@ -26,7 +24,7 @@ func init() {
 	}
 }
 
-func performOCR(inputFilePath string, filename string, id uuid.UUID) {
+func performOCR(inputFilePath string, filename string, id string) {
 	var wg sync.WaitGroup
 
 	outputDir, err := createTempDir(filename) //TODO(): handle error
@@ -42,17 +40,24 @@ func performOCR(inputFilePath string, filename string, id uuid.UUID) {
 	}
 	//do ocr on every page
 
+	channel := db[id]
+
+	counter := 0
+
 	pages, _ := os.ReadDir(outputDir)
 	for _, page := range pages {
 		wg.Add(1)
 		<-limiterChannel
 		log.Println("Performing ocr on page", page.Name())
 		log.Println(page)
+		channel <- fmt.Sprintf("Processing page %d of %d", counter+1, len(pages))
+		counter++
 		go ocr(&wg, path.Join(outputDir, page.Name()), outputDir, limiterChannel)
 	}
 
 	wg.Wait()
 	//merge
+	channel <- "Merging files"
 
 	joinPDF(outputDir, path.Join(os.Getenv("PWD"), "output", fmt.Sprintf("%s.pdf", id)))
 
