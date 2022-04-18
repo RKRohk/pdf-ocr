@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
 
-  build:
+  build-backend:
     runs-on: ubuntu-latest
     steps:
     - 
@@ -23,9 +23,9 @@ jobs:
       uses: actions/cache@v2
       with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-backend-buildx-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-backend-buildx-
       
     -
       name: Login to GitHub Container Registry
@@ -44,8 +44,8 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          ghcr.io/rkrohk/pdf-ocr:${{ github.ref_name }}
-          ghcr.io/rkrohk/pdf-ocr:${{ github.sha }}
+          ghcr.io/rkrohk/pdf-ocr-backend:${{ github.ref_name }}
+          ghcr.io/rkrohk/pdf-ocr-backend:${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
     
@@ -58,6 +58,64 @@ jobs:
         platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          ghcr.io/rkrohk/pdf-ocr:latest
+          ghcr.io/rkrohk/pdf-ocr-backend:latest
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - 
+      name: Checkout
+      uses: actions/checkout@v3
+
+    - 
+      name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - 
+      name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-frontend-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-buildx-
+      
+    -
+      name: Login to GitHub Container Registry
+      uses: docker/login-action@v1 
+      with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      
+    -
+      name: Build and push
+      if: ${{ github.ref_name != 'master' }}
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          ghcr.io/rkrohk/pdf-ocr-frontend:${{ github.ref_name }}
+          ghcr.io/rkrohk/pdf-ocr-frontend:${{ github.sha }}
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
+    
+    -
+      name: Build and push
+      if: ${{ github.ref_name == 'master' }}
+      uses: docker/build-push-action@v2
+      with:
+        context: ./frontend
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          ghcr.io/rkrohk/pdf-ocr-frontend:latest
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
