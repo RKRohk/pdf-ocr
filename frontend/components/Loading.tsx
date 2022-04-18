@@ -9,7 +9,7 @@ const Loading:React.FC<LoadingProps> = ({id}) => {
 
     const initWS = async () => {
         await new Promise(resolve => setTimeout(resolve,1000))
-        const ws = new WebSocket("ws://localhost:8080/ocr/ws/"+id)
+        const ws = new WebSocket(`wss://${window.location.hostname}/ocr/ws/`+id)
         ws.onopen = (ev) => {
             console.log("socket opened")
         }
