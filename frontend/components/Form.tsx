@@ -18,13 +18,15 @@ const Form = () => {
 
   const [error, setError] = useState("");
 
-  let id //TODO(remove global state)
+  let [id,setId] = useState<string|undefined>()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
 
-    id = generateUUID()
+    const generatedID = generateUUID()
+
+    setId(generatedID)
 
     if (!file) {
       setFormState(FormState.ERROR);
@@ -32,13 +34,13 @@ const Form = () => {
       return;
     }
     formData.append("file", file);
-    formData.append("id",id)
+    formData.append("id",generatedID)
 
     try {
       setFormState(FormState.SUBMITTING);
       setError("");
       setDownUri("");
-      const response = await fetch("http://localhost:8080/ocr", {
+      const response = await fetch("/ocr", {
         method: "post",
         body: formData,
       });
